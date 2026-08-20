@@ -26,7 +26,8 @@ from ragas.metrics.collections import (
 )
 
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-JUDGE_MODEL = "llama-3.1-8b-instant"
+# Groq retired llama-3.1-8b-instant in August 2026.
+JUDGE_MODEL = os.getenv("JUDGE_MODEL", "qwen/qwen3.6-27b")
 COOLDOWN_STANDARD = 62
 COOLDOWN_MINI = 40       # between individual samples — lets sliding TPM window recover (~2,800 tok/sample)
 GENERAL_BATCH_SIZE = 1  # one sample at a time: abatch_score fires calls concurrently per sample,

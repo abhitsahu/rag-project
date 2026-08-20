@@ -1,6 +1,20 @@
 import logfire
+import re
 from app.agents.state import AgentState
+from app.config import settings
 from app.gateway import portkey_client, extract_cache_status
+
+
+_THINKING_BLOCK = re.compile(r"<think>.*?</think>", re.IGNORECASE | re.DOTALL)
+
+
+def _public_answer(content: str | None) -> str:
+    """Remove model reasoning markup before it reaches the chat or memory."""
+    answer = _THINKING_BLOCK.sub("", content or "")
+    if "<think>" in answer.lower():
+        # Be conservative if a provider returns an incomplete thinking block.
+        answer = re.split(r"<think>", answer, maxsplit=1, flags=re.IGNORECASE)[0]
+    return answer.strip() or "I couldn't generate a response. Please try again."
 
 
 def generate_node(state: AgentState):
@@ -23,6 +37,8 @@ def generate_node(state: AgentState):
         prompt = f"""
         You are a friendly and helpful Enterprise AI Assistant.
         Answer the user's latest message using the CONVERSATION HISTORY below.
+        Return only the response the user should read. Never reveal analysis,
+        chain-of-thought, planning notes, or <think> tags.
 
         CONVERSATION HISTORY:
         {history_str}
@@ -45,6 +61,8 @@ def generate_node(state: AgentState):
         prompt = f"""
         You are a Senior Technical Architect.
         Answer the question using the TECHNICAL CONTEXT provided.
+        Return only the response the user should read. Never reveal analysis,
+        chain-of-thought, planning notes, or <think> tags.
 
         TECHNICAL CONTEXT:
         {full_context}
@@ -60,9 +78,11 @@ def generate_node(state: AgentState):
         try:
             response = portkey_client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.1
+                model=f"@{settings.GROQ_SLUG}/{settings.GROQ_MODEL}",
+                temperature=0.1,
+                reasoning_format="hidden",
             )
-            content = response.choices[0].message.content
+            content = _public_answer(response.choices[0].message.content)
             cache_status = extract_cache_status(response)
             is_cache_hit = cache_status == "HIT"
 

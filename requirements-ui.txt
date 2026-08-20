@@ -1,0 +1,6 @@
+# Runtime dependencies for the Streamlit UI (`ui/`) on Python 3.11.
+
+streamlit==1.62.0
+requests==2.33.1
+logfire==4.32.1
+python-dotenv==1.2.2

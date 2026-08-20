@@ -13,15 +13,15 @@ _rails: LLMRails | None = None
 def initialize_rails() -> None:
     """
     Build the NeMo LLMRails singleton at app startup.
-    Uses llama-3.1-8b-instant for fast intent classification at the gate —
-    the heavier llama-3.3-70b-versatile is reserved for the RAG pipeline.
+    Uses the configured Groq model for low-latency intent classification.
     """
     global _rails
 
     guard_llm = ChatGroq(
         api_key=settings.GROQ_API_KEY,
-        model="llama-3.1-8b-instant",
-        temperature=0
+        model=settings.GROQ_MODEL,
+        temperature=0,
+        reasoning_format="hidden",
     )
 
     config = RailsConfig.from_content(
@@ -30,7 +30,7 @@ def initialize_rails() -> None:
     )
 
     _rails = LLMRails(config, llm=guard_llm)
-    logfire.info("🛡️ NeMo Guardrails initialised (llama-3.1-8b-instant).")
+    logfire.info(f"🛡️ NeMo Guardrails initialised ({settings.GROQ_MODEL}).")
     
     
 

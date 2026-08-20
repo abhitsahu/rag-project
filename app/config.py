@@ -15,14 +15,16 @@ class Settings:
 
     # --- REASONING ENGINE (GROQ) ---
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-    GROQ_MODEL = "llama-3.3-70b-versatile"
+    # Current non-OpenAI Groq-hosted replacement for the retired Llama IDs.
+    GROQ_MODEL = os.getenv("GROQ_MODEL", "qwen/qwen3.6-27b")
     GROQ_FALLBACK_API_KEY = os.getenv("GROQ_FALLBACK_API_KEY")
+    GROQ_FALLBACK_MODEL = os.getenv("GROQ_FALLBACK_MODEL", GROQ_MODEL)
 
     # --- LLM GATEWAY (PORTKEY) ---
     PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
     PORTKEY_CONFIG_ID = os.getenv("PORTKEY_CONFIG_ID")
-    GROQ_SLUG =  "rag"     # primary: @rag/llama-3.3-70b-versatile
-    GROQ_SLUG_2 = "brag"  # fallback: @brag/llama-3.1-8b-instant
+    GROQ_SLUG = os.getenv("GROQ_SLUG", "rag")       # primary Groq virtual key
+    GROQ_SLUG_2 = os.getenv("GROQ_SLUG_2", "brag")  # fallback Groq virtual key
 
     
     # --- OBSERVABILITY ---
