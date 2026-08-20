@@ -10,7 +10,6 @@ pydantic==2.13.4
 qdrant-client==1.17.1
 FlashRank==0.2.10
 langchain-google-genai==4.3.4
-sentence-transformers==6.0.0
 numpy==2.4.4
 
 # --- Agent workflow and LLM providers ---
